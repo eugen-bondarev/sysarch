@@ -1,78 +1,25 @@
-# React + TypeScript + Vite
+# sysarch
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+I want to build big architecture diagrams for complex software.
 
-Currently, two official plugins are available:
+This requires creating architectural diagrams.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+I want an editor to create diagrams in a flexible way.
 
-## React Compiler
+I evaluated my manual process in a drawing app on iPad and came up with the following idea:
 
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
+You create blocks representing modules. Good software is composed out of modules. To these blocks' edges you can add an arbitrary number of ports. Ports can be incoming or outgoing, they can have arbitrary, user-defined types, and a protocol (HTTP, gRPC, etc).
 
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
+You can then establish connections between ports.
 
-## Expanding the ESLint configuration
+There are some built in blocks that one might need, such as conditional diamond for example.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Furthermore, you can zoom into individual modules. Which are also systems. So you're again on the canvas but on another level and you're already given the inputs and outputs of this module. And you can also create sub modules and connections on this level. This is how you can zoom in pretty much indefinitely.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+So it's up to you to leave certain systems - for example the self explanatory ones - as black boxes and to model deliberately many levels of the others.
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+To summarize:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
-
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
-```
+- Systems are composed out of modules
+- You can zoom into every module and see again a system which you can model as well
+- You can label many things such as connections, ports, edges, modules etc.
