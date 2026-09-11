@@ -5,26 +5,30 @@ import {
   useNodesState,
   type Connection,
 } from '@xyflow/react'
-import { CustomNode, type ThingNode } from './CustomNode'
+import {
+  CUSTOM_NODE_TYPE,
+  CustomNode,
+  type CustomNodeDefinition,
+} from './CustomNode'
 import {
   CUSTOM_EDGE_TYPE,
   CustomEdge,
   type CustomEdgeDefinition,
 } from './CustomEdge'
 
-const NODE_TYPES = { thing: CustomNode }
+const NODE_TYPES = { [CUSTOM_NODE_TYPE]: CustomNode }
 const EDGE_TYPES = { [CUSTOM_EDGE_TYPE]: CustomEdge }
 
-const INITIAL_NODES: ThingNode[] = [
+const INITIAL_NODES: CustomNodeDefinition[] = [
   {
     id: 'a',
-    type: 'thing',
+    type: CUSTOM_NODE_TYPE,
     data: { label: 'Alpha' },
     position: { x: 40, y: 140 },
   },
   {
     id: 'b',
-    type: 'thing',
+    type: CUSTOM_NODE_TYPE,
     data: { label: 'Beta' },
     position: { x: 300, y: 140 },
   },
@@ -47,7 +51,7 @@ export function Flow() {
       ...nodes,
       {
         id: `node-${nodes.length}`,
-        type: 'thing',
+        type: CUSTOM_NODE_TYPE,
         data: { label: `Node ${nodes.length}` },
         position: { x: 40, y: 60 + nodes.length * 90 },
       },
