@@ -5,11 +5,15 @@ import {
   useNodesState,
   type Connection,
 } from '@xyflow/react'
-import { Thing, type ThingNode } from './Thing'
-import { Spark, type SparkEdge } from './Spark'
+import { Thing, type ThingNode } from './CustomNode'
+import {
+  CUSTOM_EDGE_TYPE,
+  CustomEdge,
+  type CustomEdgeDefinition,
+} from './CustomEdge'
 
 const NODE_TYPES = { thing: Thing }
-const EDGE_TYPES = { spark: Spark }
+const EDGE_TYPES = { [CUSTOM_EDGE_TYPE]: CustomEdge }
 
 const INITIAL_NODES: ThingNode[] = [
   {
@@ -26,8 +30,8 @@ const INITIAL_NODES: ThingNode[] = [
   },
 ]
 
-const INITIAL_EDGES: SparkEdge[] = [
-  { id: 'a-b', source: 'a', target: 'b', type: 'spark' },
+const INITIAL_EDGES: CustomEdgeDefinition[] = [
+  { id: 'a-b', source: 'a', target: 'b', type: CUSTOM_EDGE_TYPE },
 ]
 
 export function Flow() {
@@ -35,7 +39,7 @@ export function Flow() {
   const [edges, setEdges, onEdgesChange] = useEdgesState(INITIAL_EDGES)
 
   const onConnect = (edge: Connection) => {
-    setEdges((edges) => addEdge({ ...edge, type: 'spark' }, edges))
+    setEdges((edges) => addEdge({ ...edge, type: CUSTOM_EDGE_TYPE }, edges))
   }
 
   const addNode = () =>
