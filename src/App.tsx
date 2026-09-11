@@ -1,5 +1,5 @@
-function App() {
-  return <div>Hi</div>
-}
+import { Flow } from './Flow'
 
-export default App
+export default function App() {
+  return <Flow />
+}
