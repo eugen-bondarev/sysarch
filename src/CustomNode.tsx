@@ -6,7 +6,7 @@ export type ThingData = {
 
 export type ThingNode = Node<ThingData, 'thing'>
 
-export function Thing({ data }: NodeProps<ThingNode>) {
+export function CustomNode({ data }: NodeProps<ThingNode>) {
   return (
     <div className="rounded-lg border border-zinc-300 bg-white px-4 py-2 shadow">
       <Handle type="target" position={Position.Left} />

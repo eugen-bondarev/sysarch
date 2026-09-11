@@ -5,14 +5,14 @@ import {
   useNodesState,
   type Connection,
 } from '@xyflow/react'
-import { Thing, type ThingNode } from './CustomNode'
+import { CustomNode, type ThingNode } from './CustomNode'
 import {
   CUSTOM_EDGE_TYPE,
   CustomEdge,
   type CustomEdgeDefinition,
 } from './CustomEdge'
 
-const NODE_TYPES = { thing: Thing }
+const NODE_TYPES = { thing: CustomNode }
 const EDGE_TYPES = { [CUSTOM_EDGE_TYPE]: CustomEdge }
 
 const INITIAL_NODES: ThingNode[] = [
