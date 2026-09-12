@@ -12,7 +12,7 @@ export default function Button({ children, onClick, className }: ButtonProps) {
     <button
       onClick={onClick}
       className={cn(
-        `absolute left-4 top-4 z-10 rounded-md bg-zinc-900 px-3 py-1 text-sm text-white`,
+        `absolute left-4 top-4 z-10 rounded-md bg-zinc-900 hover:bg-zinc-800 transition cursor-pointer px-3 py-1 text-sm text-white`,
         className,
       )}
     >

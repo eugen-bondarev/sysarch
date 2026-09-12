@@ -15,7 +15,7 @@ import {
   CustomEdge,
   type CustomEdgeDefinition,
 } from './CustomEdge'
-import Button from './components/ui/button'
+import Button from './ui/button'
 
 const NODE_TYPES = { [CUSTOM_NODE_TYPE]: CustomNode }
 const EDGE_TYPES = { [CUSTOM_EDGE_TYPE]: CustomEdge }
