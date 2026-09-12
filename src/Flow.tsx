@@ -59,9 +59,9 @@ export function Flow() {
     ])
 
   return (
-    <div className="fixed inset-0 flex flex-col">
+    <>
       <Button onClick={addNode}>Add node</Button>
-      <div className="h-screen w-full">
+      <div className="h-screen">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -73,6 +73,6 @@ export function Flow() {
           fitView
         />
       </div>
-    </div>
+    </>
   )
 }
