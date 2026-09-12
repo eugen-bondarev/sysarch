@@ -13,6 +13,7 @@ import {
 } from '../components/CustomEdge'
 import {
   CUSTOM_NODE_TYPE,
+  type CustomNodeData,
   type CustomNodeDefinition,
 } from '../components/CustomNode'
 
@@ -23,6 +24,7 @@ type FlowStore = {
   onEdgesChange: (changes: EdgeChange<CustomEdgeDefinition>[]) => void
   onConnect: (connection: Connection) => void
   addNode: () => void
+  updateNodeData: (id: string, data: Partial<CustomNodeData>) => void
 }
 
 const INITIAL_NODES: CustomNodeDefinition[] = [
@@ -62,5 +64,11 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
           position: { x: 40, y: 60 + get().nodes.length * 90 },
         },
       ],
+    }),
+  updateNodeData: (id, data) =>
+    set({
+      nodes: get().nodes.map((node) =>
+        node.id === id ? { ...node, data: { ...node.data, ...data } } : node,
+      ),
     }),
 }))
