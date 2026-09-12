@@ -15,6 +15,7 @@ import {
   CustomEdge,
   type CustomEdgeDefinition,
 } from './CustomEdge'
+import Button from './components/ui/button'
 
 const NODE_TYPES = { [CUSTOM_NODE_TYPE]: CustomNode }
 const EDGE_TYPES = { [CUSTOM_EDGE_TYPE]: CustomEdge }
@@ -59,12 +60,7 @@ export function Flow() {
 
   return (
     <div className="fixed inset-0 flex flex-col">
-      <button
-        onClick={addNode}
-        className="absolute left-4 top-4 z-10 rounded-md bg-zinc-900 px-3 py-1 text-sm text-white"
-      >
-        Add node
-      </button>
+      <Button onClick={addNode}>Add node</Button>
       <div className="h-screen w-full">
         <ReactFlow
           nodes={nodes}
