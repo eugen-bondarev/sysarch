@@ -3,6 +3,7 @@ import {
   addEdge,
   applyEdgeChanges,
   applyNodeChanges,
+  MarkerType,
   type Connection,
   type EdgeChange,
   type NodeChange,
@@ -79,6 +80,7 @@ const INITIAL_EDGES: CustomEdgeDefinition[] = [
     target: 'b',
     targetHandle: 'b-in',
     type: CUSTOM_EDGE_TYPE,
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#8b5cf6', strokeWidth: 2 },
   },
 ]
 
@@ -131,7 +133,18 @@ export const createFlowStore = (storage: GraphStorage) => {
       set({ edges: applyEdgeChanges(changes, get().edges) }),
     onConnect: (connection) =>
       set({
-        edges: addEdge({ ...connection, type: CUSTOM_EDGE_TYPE }, get().edges),
+        edges: addEdge(
+          {
+            ...connection,
+            type: CUSTOM_EDGE_TYPE,
+            markerEnd: {
+              type: MarkerType.ArrowClosed,
+              color: '#8b5cf6',
+              strokeWidth: 2,
+            },
+          },
+          get().edges,
+        ),
       }),
     addNode: () =>
       set({
