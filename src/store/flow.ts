@@ -13,6 +13,8 @@ import {
 } from '../components/CustomEdge'
 import {
   CUSTOM_NODE_TYPE,
+  NODE_HEIGHT,
+  NODE_WIDTH,
   type CustomNodeData,
   type CustomNodeDefinition,
   type Port,
@@ -32,14 +34,14 @@ type FlowStore = {
   removePort: (nodeId: string, portId: string) => void
 }
 
-const NODE_WIDTH = 200
-
 const INITIAL_NODES: CustomNodeDefinition[] = [
   {
     id: 'a',
     type: CUSTOM_NODE_TYPE,
     data: {
       label: 'Alpha',
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT,
       ports: [
         { id: 'a-in', type: 'input', label: 'In', x: 0, y: 20 },
         { id: 'a-out', type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
@@ -52,6 +54,8 @@ const INITIAL_NODES: CustomNodeDefinition[] = [
     type: CUSTOM_NODE_TYPE,
     data: {
       label: 'Beta',
+      width: NODE_WIDTH,
+      height: NODE_HEIGHT,
       ports: [
         { id: 'b-in', type: 'input', label: 'In', x: 0, y: 20 },
         { id: 'b-out', type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
@@ -86,7 +90,26 @@ const updateNodePorts = (
 export const useFlowStore = create<FlowStore>((set, get) => ({
   nodes: INITIAL_NODES,
   edges: INITIAL_EDGES,
-  onNodesChange: (changes) => set({ nodes: applyNodeChanges(changes, get().nodes) }),
+  onNodesChange: (changes) =>
+    set({
+      nodes: applyNodeChanges(changes, get().nodes).map((node) => {
+        const width = node.width
+        const height = node.height
+        if (width === undefined || height === undefined) {
+          return node
+        }
+        if (node.data.width === width && node.data.height === height) {
+          return node
+        }
+        const ports = node.data.ports.map((port) =>
+          port.type === 'output' ? { ...port, x: width } : port,
+        )
+        return {
+          ...node,
+          data: { ...node.data, width, height, ports },
+        }
+      }),
+    }),
   onEdgesChange: (changes) => set({ edges: applyEdgeChanges(changes, get().edges) }),
   onConnect: (connection) =>
     set({ edges: addEdge({ ...connection, type: CUSTOM_EDGE_TYPE }, get().edges) }),
@@ -99,6 +122,8 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
           type: CUSTOM_NODE_TYPE,
           data: {
             label: `Node ${get().nodes.length}`,
+            width: NODE_WIDTH,
+            height: NODE_HEIGHT,
             ports: [
               { id: crypto.randomUUID(), type: 'input', label: 'In', x: 0, y: 20 },
               { id: crypto.randomUUID(), type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
@@ -117,6 +142,8 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
   addPort: (nodeId, type) =>
     set({
       nodes: updateNodePorts(get().nodes, nodeId, (ports) => {
+        const node = get().nodes.find((n) => n.id === nodeId)
+        const width = node?.data.width ?? NODE_WIDTH
         const index = ports.filter((port) => port.type === type).length
         return [
           ...ports,
@@ -124,7 +151,7 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
             id: crypto.randomUUID(),
             type,
             label: `${type === 'input' ? 'Input' : 'Output'} ${index + 1}`,
-            x: type === 'input' ? 0 : NODE_WIDTH,
+            x: type === 'input' ? 0 : width,
             y: 20 + index * 40,
           },
         ]
