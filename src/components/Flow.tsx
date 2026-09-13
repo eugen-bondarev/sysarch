@@ -23,8 +23,16 @@ const isSystemDark = () =>
   window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
 
 function FlowCanvas({ theme }: { theme: Theme }) {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, registerFlowApi } =
-    useFlowStore()
+  const {
+    nodes,
+    edges,
+    onNodesChange,
+    onEdgesChange,
+    onConnect,
+    registerFlowApi,
+    startDeletingNodes,
+    finishDeletingNodes,
+  } = useFlowStore()
 
   const { screenToFlowPosition } = useReactFlow()
   const mouseRef = useRef<XYPosition | null>(null)
@@ -51,6 +59,24 @@ function FlowCanvas({ theme }: { theme: Theme }) {
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
+        onBeforeDelete={async ({
+          nodes: nodesToDelete,
+          edges: edgesToDelete,
+        }) => {
+          if (nodesToDelete.length === 0) {
+            return true
+          }
+          startDeletingNodes(nodesToDelete.map((node) => node.id))
+          setTimeout(
+            () =>
+              finishDeletingNodes(
+                nodesToDelete.map((node) => node.id),
+                edgesToDelete.map((edge) => edge.id),
+              ),
+            200,
+          )
+          return false
+        }}
         elevateNodesOnSelect={false}
         fitView
         snapToGrid

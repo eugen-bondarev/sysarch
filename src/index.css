@@ -40,3 +40,12 @@ html.dark {
     transform: scale(1);
   }
 }
+
+@keyframes node-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

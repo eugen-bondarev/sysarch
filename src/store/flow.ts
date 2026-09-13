@@ -34,10 +34,14 @@ type FlowStore = {
   nodes: CustomNodeDefinition[]
   edges: CustomEdgeDefinition[]
   flowApi: FlowApi | null
+  deletingNodeIds: string[]
+  newNodeIds: string[]
   onNodesChange: (changes: NodeChange<CustomNodeDefinition>[]) => void
   onEdgesChange: (changes: EdgeChange<CustomEdgeDefinition>[]) => void
   onConnect: (connection: Connection) => void
   registerFlowApi: (api: FlowApi) => void
+  startDeletingNodes: (ids: string[]) => void
+  finishDeletingNodes: (nodeIds: string[], edgeIds: string[]) => void
   addNode: (position?: XYPosition) => void
   updateNodeData: (id: string, data: Partial<CustomNodeData>) => void
   updateNodeZIndex: (id: string, zIndex: number) => void
@@ -154,6 +158,8 @@ export const createFlowStore = (storage: GraphStorage) => {
     nodes: saved?.nodes ?? INITIAL_NODES,
     edges,
     flowApi: null,
+    deletingNodeIds: [],
+    newNodeIds: [],
     onNodesChange: (changes) =>
       set({
         nodes: applyNodeChanges(changes, get().nodes).map((node) => {
@@ -196,12 +202,26 @@ export const createFlowStore = (storage: GraphStorage) => {
         ),
       }),
     registerFlowApi: (api) => set({ flowApi: api }),
-    addNode: (position) =>
+    startDeletingNodes: (ids) =>
+      set({ deletingNodeIds: [...get().deletingNodeIds, ...ids] }),
+    finishDeletingNodes: (nodeIds, edgeIds) => {
+      const nodeSet = new Set(nodeIds)
+      const edgeSet = new Set(edgeIds)
+      set({
+        nodes: get().nodes.filter((node) => !nodeSet.has(node.id)),
+        edges: get().edges.filter((edge) => !edgeSet.has(edge.id)),
+        deletingNodeIds: get().deletingNodeIds.filter(
+          (id) => !nodeSet.has(id),
+        ),
+      })
+    },
+    addNode: (position) => {
+      const id = crypto.randomUUID()
       set({
         nodes: [
           ...get().nodes,
           {
-            id: crypto.randomUUID(),
+            id,
             type: CUSTOM_NODE_TYPE,
             data: {
               label: `Node ${get().nodes.length}`,
@@ -234,7 +254,9 @@ export const createFlowStore = (storage: GraphStorage) => {
             zIndex: 0,
           },
         ],
-      }),
+        newNodeIds: [...get().newNodeIds, id],
+      })
+    },
     updateNodeData: (id, data) =>
       set({
         nodes: get().nodes.map((node) =>

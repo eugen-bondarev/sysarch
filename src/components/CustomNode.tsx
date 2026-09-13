@@ -22,6 +22,8 @@ export function CustomNode({
 }: NodeProps<CustomNodeDefinition>) {
   const updateNodeInternals = useUpdateNodeInternals()
   const updatePort = useFlowStore((state) => state.updatePort)
+  const deleting = useFlowStore((state) => state.deletingNodeIds.includes(id))
+  const pop = useFlowStore((state) => state.newNodeIds.includes(id))
   const [hovered, setHovered] = useState(false)
   const [resizing, setResizing] = useState(false)
   const nodeRef = useRef<HTMLDivElement>(null)
@@ -78,7 +80,9 @@ export function CustomNode({
       className={cn(
         'relative border border-zinc-300 bg-white px-4 py-2 shadow dark:border-zinc-600 dark:bg-zinc-900',
         selected && 'border-primary ring-2 ring-primary/30',
-        'animate-[node-pop_200ms_ease-out]',
+        deleting
+          ? 'animate-[node-out_180ms_ease-in_forwards]'
+          : pop && 'animate-[node-pop_200ms_ease-out]',
       )}
       style={{ width: data.width, height: data.height }}
       onMouseEnter={() => setHovered(true)}
