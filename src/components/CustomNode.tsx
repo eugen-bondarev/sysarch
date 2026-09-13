@@ -78,6 +78,7 @@ export function CustomNode({
       className={cn(
         'relative border border-zinc-300 bg-white px-4 py-2 shadow dark:border-zinc-600 dark:bg-zinc-900',
         selected && 'border-primary ring-2 ring-primary/30',
+        'animate-[node-pop_200ms_ease-out]',
       )}
       style={{ width: data.width, height: data.height }}
       onMouseEnter={() => setHovered(true)}
