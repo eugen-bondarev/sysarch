@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { getConnectionPath } from './connection-path'
+import { getConnectionPath, getPortPosition } from './connection-path'
 
 type Point = { x: number; y: number }
 type Cubic = { p0: Point; p1: Point; p2: Point; p3: Point }
@@ -84,5 +84,31 @@ describe('getConnectionPath', () => {
       expect(p.x).toBeGreaterThanOrEqual(140)
       expect(p.x).toBeLessThanOrEqual(220)
     }
+  })
+})
+
+describe('getPortPosition', () => {
+  test('detects a port on the left edge', () => {
+    expect(getPortPosition(0, 20, 200, 200)).toBe('left')
+  })
+
+  test('detects a port on the right edge', () => {
+    expect(getPortPosition(200, 20, 200, 200)).toBe('right')
+  })
+
+  test('detects a port on the bottom edge', () => {
+    expect(getPortPosition(100, 98, 200, 100)).toBe('bottom')
+  })
+
+  test('detects a port on the top edge', () => {
+    expect(getPortPosition(100, 0, 200, 100)).toBe('top')
+  })
+
+  test('detects a bottom port even when it is off-center', () => {
+    expect(getPortPosition(120, 98, 200, 100)).toBe('bottom')
+  })
+
+  test('does not flip when the port is exactly on the edge', () => {
+    expect(getPortPosition(420, 20, 420, 260)).toBe('right')
   })
 })

@@ -16,6 +16,22 @@ const DIRECTION: Record<EdgePosition, Point> = {
   bottom: { x: 0, y: 1 },
 }
 
+export function getPortPosition(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): EdgePosition {
+  const edges: [EdgePosition, number][] = [
+    ['left', x],
+    ['right', width - x],
+    ['top', y],
+    ['bottom', height - y],
+  ]
+  edges.sort((a, b) => a[1] - b[1])
+  return edges[0][0]
+}
+
 export function getConnectionPath(
   source: Point,
   target: Point,
