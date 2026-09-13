@@ -5,9 +5,32 @@ type ButtonProps = {
   children?: ReactNode
   onClick?: () => void
   className?: string
+  hotkey?: ('Ctrl' | string)[]
 }
 
-export default function Button({ children, onClick, className }: ButtonProps) {
+function isMacOS() {
+  return navigator.platform.includes('Mac')
+}
+
+const REMAP_KEYS: Record<string, string> = {
+  Ctrl: isMacOS() ? '⌘' : 'Ctrl',
+}
+
+export default function Button({
+  children,
+  onClick,
+  className,
+  hotkey,
+}: ButtonProps) {
+  const filteredHotKey = !hotkey
+    ? undefined
+    : hotkey?.map((k) => {
+        if (k in REMAP_KEYS) {
+          return REMAP_KEYS[k]
+        }
+        return k
+      })
+
   return (
     <button
       onClick={onClick}
@@ -16,7 +39,12 @@ export default function Button({ children, onClick, className }: ButtonProps) {
         className,
       )}
     >
-      {children}
+      {children}{' '}
+      {filteredHotKey && (
+        <span className="text-zinc-400 dark:text-zinc-500">
+          {filteredHotKey.join(' + ')}
+        </span>
+      )}
     </button>
   )
 }

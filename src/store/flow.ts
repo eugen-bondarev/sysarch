@@ -7,6 +7,7 @@ import {
   type Connection,
   type EdgeChange,
   type NodeChange,
+  type XYPosition,
 } from '@xyflow/react'
 import { GraphStorage, type StoredEdge, type StoredNode } from './graph-storage'
 import { scalePortPosition } from '../lib/connection-path'
@@ -30,7 +31,7 @@ type FlowStore = {
   onNodesChange: (changes: NodeChange<CustomNodeDefinition>[]) => void
   onEdgesChange: (changes: EdgeChange<CustomEdgeDefinition>[]) => void
   onConnect: (connection: Connection) => void
-  addNode: () => void
+  addNode: (position?: XYPosition) => void
   updateNodeData: (id: string, data: Partial<CustomNodeData>) => void
   updateNodeZIndex: (id: string, zIndex: number) => void
   addPort: (nodeId: string, type: PortType) => void
@@ -96,7 +97,7 @@ const updateNodePorts = (
 
 const EDGE_MARKER = {
   type: MarkerType.ArrowClosed,
-  color: 'var(--color-primary)',
+  color: 'context-stroke',
   strokeWidth: 2,
 }
 
@@ -172,12 +173,12 @@ export const createFlowStore = (storage: GraphStorage) => {
           get().edges,
         ),
       }),
-    addNode: () =>
+    addNode: (position) =>
       set({
         nodes: [
           ...get().nodes,
           {
-            id: `node-${get().nodes.length}`,
+            id: crypto.randomUUID(),
             type: CUSTOM_NODE_TYPE,
             data: {
               label: `Node ${get().nodes.length}`,
@@ -200,7 +201,8 @@ export const createFlowStore = (storage: GraphStorage) => {
                 },
               ],
             },
-            position: { x: 40, y: 60 + get().nodes.length * 90 },
+            position: position ?? { x: 40, y: 60 + get().nodes.length * 90 },
+            selected: true,
             zIndex: 0,
           },
         ],

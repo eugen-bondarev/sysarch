@@ -37,7 +37,7 @@ describe('round-trip', () => {
 
     expect(store.getState().edges[0].markerEnd).toEqual({
       type: MarkerType.ArrowClosed,
-      color: 'var(--color-primary)',
+      color: 'context-stroke',
       strokeWidth: 2,
     })
 
@@ -56,7 +56,7 @@ describe('round-trip', () => {
     const store2 = createFlowStore(storage)
     expect(store2.getState().edges[0].markerEnd).toEqual({
       type: MarkerType.ArrowClosed,
-      color: 'var(--color-primary)',
+      color: 'context-stroke',
       strokeWidth: 2,
     })
     expect(store2.getState().edges[0].type).toBe(CUSTOM_EDGE_TYPE)

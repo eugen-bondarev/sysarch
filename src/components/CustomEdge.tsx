@@ -49,7 +49,7 @@ export function CustomEdge(props: EdgeProps<CustomEdgeDefinition>) {
       markerStart={props.markerStart}
       markerEnd={props.markerEnd}
       interactionWidth={props.interactionWidth}
-      style={{ stroke: 'var(--color-primary)', strokeWidth: 2 }}
+      style={{ strokeWidth: 2 }}
     />
   )
 }

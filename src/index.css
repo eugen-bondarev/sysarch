@@ -14,6 +14,11 @@
 .react-flow {
   --xy-background-color: #fff;
   --xy-background-pattern-color: #d4d4d8;
+  --xy-edge-stroke-selected: var(--color-primary);
+}
+
+.react-flow__edge:hover .react-flow__edge-path {
+  stroke: var(--color-primary);
 }
 
 .react-flow.dark {
