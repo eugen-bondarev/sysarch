@@ -32,6 +32,7 @@ export function Flow() {
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
+          elevateNodesOnSelect={false}
           fitView
           snapToGrid
           snapGrid={[20, 20]}

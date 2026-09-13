@@ -8,6 +8,7 @@ type NodeInspectorProps = {
 
 export function NodeInspector({ node }: NodeInspectorProps) {
   const updateNodeData = useFlowStore((state) => state.updateNodeData)
+  const updateNodeZIndex = useFlowStore((state) => state.updateNodeZIndex)
   const addPort = useFlowStore((state) => state.addPort)
 
   return (
@@ -18,6 +19,15 @@ export function NodeInspector({ node }: NodeInspectorProps) {
         value={node.data.label}
         onChange={(event) =>
           updateNodeData(node.id, { label: event.target.value })
+        }
+        className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-800 focus:border-violet-500 focus:outline-none"
+      />
+      <label className="mt-3 block text-xs font-medium text-zinc-500">Z-index</label>
+      <input
+        type="number"
+        value={node.zIndex ?? 0}
+        onChange={(event) =>
+          updateNodeZIndex(node.id, Number(event.target.value))
         }
         className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-800 focus:border-violet-500 focus:outline-none"
       />

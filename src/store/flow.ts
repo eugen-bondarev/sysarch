@@ -29,6 +29,7 @@ type FlowStore = {
   onConnect: (connection: Connection) => void
   addNode: () => void
   updateNodeData: (id: string, data: Partial<CustomNodeData>) => void
+  updateNodeZIndex: (id: string, zIndex: number) => void
   addPort: (nodeId: string, type: PortType) => void
   updatePort: (nodeId: string, portId: string, patch: Partial<Port>) => void
   removePort: (nodeId: string, portId: string) => void
@@ -48,6 +49,7 @@ const INITIAL_NODES: CustomNodeDefinition[] = [
       ],
     },
     position: { x: 40, y: 140 },
+    zIndex: 0,
   },
   {
     id: 'b',
@@ -62,6 +64,7 @@ const INITIAL_NODES: CustomNodeDefinition[] = [
       ],
     },
     position: { x: 300, y: 140 },
+    zIndex: 0,
   },
 ]
 
@@ -130,6 +133,7 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
             ],
           },
           position: { x: 40, y: 60 + get().nodes.length * 90 },
+          zIndex: 0,
         },
       ],
     }),
@@ -137,6 +141,12 @@ export const useFlowStore = create<FlowStore>((set, get) => ({
     set({
       nodes: get().nodes.map((node) =>
         node.id === id ? { ...node, data: { ...node.data, ...data } } : node,
+      ),
+    }),
+  updateNodeZIndex: (id, zIndex) =>
+    set({
+      nodes: get().nodes.map((node) =>
+        node.id === id ? { ...node, zIndex } : node,
       ),
     }),
   addPort: (nodeId, type) =>
