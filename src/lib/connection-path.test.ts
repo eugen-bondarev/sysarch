@@ -3,7 +3,9 @@ import {
   clampToPerimeter,
   getConnectionPath,
   getPortPosition,
+  resolvePortPlacement,
   scalePortPosition,
+  snapToStep,
 } from './connection-path'
 
 type Point = { x: number; y: number }
@@ -170,6 +172,70 @@ describe('scalePortPosition', () => {
     expect(scalePortPosition(50, 200, 200, 200, 300, 400)).toEqual({
       x: 75,
       y: 400,
+    })
+  })
+})
+
+describe('snapToStep', () => {
+  test('rounds a value down to the nearest step', () => {
+    expect(snapToStep(123, 10)).toBe(120)
+  })
+
+  test('rounds a value up to the nearest step', () => {
+    expect(snapToStep(127, 10)).toBe(130)
+  })
+
+  test('keeps an exact multiple unchanged', () => {
+    expect(snapToStep(120, 10)).toBe(120)
+  })
+
+  test('rounds a halfway value up', () => {
+    expect(snapToStep(125, 10)).toBe(130)
+  })
+
+  test('snaps to zero when below half a step', () => {
+    expect(snapToStep(4, 10)).toBe(0)
+  })
+})
+
+describe('resolvePortPlacement', () => {
+  test('places a double-click on the left edge as an input port', () => {
+    expect(resolvePortPlacement(0, 123, 200, 200)).toEqual({
+      x: 0,
+      y: 120,
+      type: 'input',
+    })
+  })
+
+  test('places a double-click near the top edge as an input port', () => {
+    expect(resolvePortPlacement(153, 2, 200, 200)).toEqual({
+      x: 150,
+      y: 0,
+      type: 'input',
+    })
+  })
+
+  test('places a double-click on the right edge as an output port', () => {
+    expect(resolvePortPlacement(200, 47, 200, 200)).toEqual({
+      x: 200,
+      y: 50,
+      type: 'output',
+    })
+  })
+
+  test('places a double-click on the bottom edge as an output port', () => {
+    expect(resolvePortPlacement(85, 200, 200, 200)).toEqual({
+      x: 90,
+      y: 200,
+      type: 'output',
+    })
+  })
+
+  test('clamps an interior double-click to the nearest side', () => {
+    expect(resolvePortPlacement(190, 100, 200, 200)).toEqual({
+      x: 200,
+      y: 100,
+      type: 'output',
     })
   })
 })

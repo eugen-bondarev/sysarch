@@ -22,7 +22,42 @@ const EDGE_TYPES = { [CUSTOM_EDGE_TYPE]: CustomEdge }
 const isSystemDark = () =>
   window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
 
+const isEditableTarget = (target: EventTarget | null) =>
+  target instanceof HTMLElement &&
+  (target.tagName === 'INPUT' ||
+    target.tagName === 'TEXTAREA' ||
+    target.tagName === 'SELECT' ||
+    target.isContentEditable)
+
+function usePortEditMode() {
+  const setPortEditMode = useFlowStore((state) => state.setPortEditMode)
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Alt' && !isEditableTarget(event.target)) {
+        setPortEditMode(true)
+      }
+    }
+    const onKeyUp = (event: KeyboardEvent) => {
+      if (event.key === 'Alt') {
+        setPortEditMode(false)
+      }
+    }
+    const onBlur = () => setPortEditMode(false)
+    window.addEventListener('keydown', onKeyDown)
+    window.addEventListener('keyup', onKeyUp)
+    window.addEventListener('blur', onBlur)
+    return () => {
+      window.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('keyup', onKeyUp)
+      window.removeEventListener('blur', onBlur)
+    }
+  }, [setPortEditMode])
+}
+
 function FlowCanvas({ theme }: { theme: Theme }) {
+  usePortEditMode()
+
   const {
     nodes,
     edges,

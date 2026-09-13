@@ -36,18 +36,21 @@ type FlowStore = {
   flowApi: FlowApi | null
   deletingNodeIds: string[]
   newNodeIds: string[]
+  portEditMode: boolean
   onNodesChange: (changes: NodeChange<CustomNodeDefinition>[]) => void
   onEdgesChange: (changes: EdgeChange<CustomEdgeDefinition>[]) => void
   onConnect: (connection: Connection) => void
   registerFlowApi: (api: FlowApi) => void
   startDeletingNodes: (ids: string[]) => void
   finishDeletingNodes: (nodeIds: string[], edgeIds: string[]) => void
+  setPortEditMode: (on: boolean) => void
   addNode: (position?: XYPosition) => void
   updateNodeData: (id: string, data: Partial<CustomNodeData>) => void
   updateNodeZIndex: (id: string, zIndex: number) => void
-  addPort: (nodeId: string, type: PortType) => void
+  addPort: (nodeId: string, type: PortType, x?: number, y?: number) => void
   updatePort: (nodeId: string, portId: string, patch: Partial<Port>) => void
   removePort: (nodeId: string, portId: string) => void
+  flipPort: (nodeId: string, portId: string) => void
   save: () => void
 }
 
@@ -160,6 +163,7 @@ export const createFlowStore = (storage: GraphStorage) => {
     flowApi: null,
     deletingNodeIds: [],
     newNodeIds: [],
+    portEditMode: false,
     onNodesChange: (changes) =>
       set({
         nodes: applyNodeChanges(changes, get().nodes).map((node) => {
@@ -269,7 +273,7 @@ export const createFlowStore = (storage: GraphStorage) => {
           node.id === id ? { ...node, zIndex } : node,
         ),
       }),
-    addPort: (nodeId, type) =>
+    addPort: (nodeId, type, x, y) =>
       set({
         nodes: updateNodePorts(get().nodes, nodeId, (ports) => {
           const node = get().nodes.find((n) => n.id === nodeId)
@@ -281,8 +285,8 @@ export const createFlowStore = (storage: GraphStorage) => {
               id: crypto.randomUUID(),
               type,
               label: `${type === 'input' ? 'Input' : 'Output'} ${index + 1}`,
-              x: type === 'input' ? 0 : width,
-              y: 20 + index * 40,
+              x: x ?? (type === 'input' ? 0 : width),
+              y: y ?? 20 + index * 40,
             },
           ]
         }),
@@ -301,6 +305,27 @@ export const createFlowStore = (storage: GraphStorage) => {
           ports.filter((port) => port.id !== portId),
         ),
       }),
+    flipPort: (nodeId, portId) =>
+      set({
+        nodes: updateNodePorts(get().nodes, nodeId, (ports) =>
+          ports.map((port) =>
+            port.id === portId
+              ? {
+                  ...port,
+                  type: port.type === 'input' ? 'output' : 'input',
+                }
+              : port,
+          ),
+        ),
+        edges: get().edges.filter(
+          (edge) =>
+            !(
+              (edge.source === nodeId && edge.sourceHandle === portId) ||
+              (edge.target === nodeId && edge.targetHandle === portId)
+            ),
+        ),
+      }),
+    setPortEditMode: (on) => set({ portEditMode: on }),
     save: () =>
       storage.save({
         nodes: get().nodes.map(sanitizeNode),

@@ -1,9 +1,17 @@
+import type { PortType } from './node'
+
 export type Point = {
   x: number
   y: number
 }
 
 export type EdgePosition = 'left' | 'right' | 'top' | 'bottom'
+
+export const PORT_SNAP_STEP = 10
+
+export function snapToStep(value: number, step: number): number {
+  return Math.round(value / step) * step
+}
 
 export type ConnectionPathOptions = {
   offset?: number
@@ -71,6 +79,21 @@ export function getPortPosition(
   ]
   edges.sort((a, b) => a[1] - b[1])
   return edges[0][0]
+}
+
+export function resolvePortPlacement(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): { x: number; y: number; type: PortType } {
+  const clamped = clampToPerimeter(x, y, width, height)
+  const position = getPortPosition(clamped.x, clamped.y, width, height)
+  return {
+    x: snapToStep(clamped.x, PORT_SNAP_STEP),
+    y: snapToStep(clamped.y, PORT_SNAP_STEP),
+    type: position === 'left' || position === 'top' ? 'input' : 'output',
+  }
 }
 
 export function getConnectionPath(
