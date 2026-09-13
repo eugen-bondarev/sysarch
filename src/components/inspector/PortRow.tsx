@@ -1,4 +1,4 @@
-import { useFlowStore } from '../../store/flow'
+import { useFlowStore } from '../../store'
 import type { Port } from '../CustomNode'
 
 type PortRowProps = {

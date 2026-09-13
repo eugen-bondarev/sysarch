@@ -7,6 +7,7 @@ import {
   type EdgeChange,
   type NodeChange,
 } from '@xyflow/react'
+import { GraphStorage } from './graph-storage'
 import {
   CUSTOM_EDGE_TYPE,
   type CustomEdgeDefinition,
@@ -33,6 +34,7 @@ type FlowStore = {
   addPort: (nodeId: string, type: PortType) => void
   updatePort: (nodeId: string, portId: string, patch: Partial<Port>) => void
   removePort: (nodeId: string, portId: string) => void
+  save: () => void
 }
 
 const INITIAL_NODES: CustomNodeDefinition[] = [
@@ -90,93 +92,101 @@ const updateNodePorts = (
       : node,
   )
 
-export const useFlowStore = create<FlowStore>((set, get) => ({
-  nodes: INITIAL_NODES,
-  edges: INITIAL_EDGES,
-  onNodesChange: (changes) =>
-    set({
-      nodes: applyNodeChanges(changes, get().nodes).map((node) => {
-        const width = node.width
-        const height = node.height
-        if (width === undefined || height === undefined) {
-          return node
-        }
-        if (node.data.width === width && node.data.height === height) {
-          return node
-        }
-        const ports = node.data.ports.map((port) =>
-          port.type === 'output' ? { ...port, x: width } : port,
-        )
-        return {
-          ...node,
-          data: { ...node.data, width, height, ports },
-        }
+export const createFlowStore = (storage: GraphStorage) => {
+  const saved = storage.load()
+
+  return create<FlowStore>((set, get) => ({
+    nodes: saved?.nodes ?? INITIAL_NODES,
+    edges: saved?.edges ?? INITIAL_EDGES,
+    onNodesChange: (changes) =>
+      set({
+        nodes: applyNodeChanges(changes, get().nodes).map((node) => {
+          const width = node.width
+          const height = node.height
+          if (width === undefined || height === undefined) {
+            return node
+          }
+          if (node.data.width === width && node.data.height === height) {
+            return node
+          }
+          const ports = node.data.ports.map((port) =>
+            port.type === 'output' ? { ...port, x: width } : port,
+          )
+          return {
+            ...node,
+            data: { ...node.data, width, height, ports },
+          }
+        }),
       }),
-    }),
-  onEdgesChange: (changes) => set({ edges: applyEdgeChanges(changes, get().edges) }),
-  onConnect: (connection) =>
-    set({ edges: addEdge({ ...connection, type: CUSTOM_EDGE_TYPE }, get().edges) }),
-  addNode: () =>
-    set({
-      nodes: [
-        ...get().nodes,
-        {
-          id: `node-${get().nodes.length}`,
-          type: CUSTOM_NODE_TYPE,
-          data: {
-            label: `Node ${get().nodes.length}`,
-            width: NODE_WIDTH,
-            height: NODE_HEIGHT,
-            ports: [
-              { id: crypto.randomUUID(), type: 'input', label: 'In', x: 0, y: 20 },
-              { id: crypto.randomUUID(), type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
-            ],
-          },
-          position: { x: 40, y: 60 + get().nodes.length * 90 },
-          zIndex: 0,
-        },
-      ],
-    }),
-  updateNodeData: (id, data) =>
-    set({
-      nodes: get().nodes.map((node) =>
-        node.id === id ? { ...node, data: { ...node.data, ...data } } : node,
-      ),
-    }),
-  updateNodeZIndex: (id, zIndex) =>
-    set({
-      nodes: get().nodes.map((node) =>
-        node.id === id ? { ...node, zIndex } : node,
-      ),
-    }),
-  addPort: (nodeId, type) =>
-    set({
-      nodes: updateNodePorts(get().nodes, nodeId, (ports) => {
-        const node = get().nodes.find((n) => n.id === nodeId)
-        const width = node?.data.width ?? NODE_WIDTH
-        const index = ports.filter((port) => port.type === type).length
-        return [
-          ...ports,
+    onEdgesChange: (changes) =>
+      set({ edges: applyEdgeChanges(changes, get().edges) }),
+    onConnect: (connection) =>
+      set({ edges: addEdge({ ...connection, type: CUSTOM_EDGE_TYPE }, get().edges) }),
+    addNode: () =>
+      set({
+        nodes: [
+          ...get().nodes,
           {
-            id: crypto.randomUUID(),
-            type,
-            label: `${type === 'input' ? 'Input' : 'Output'} ${index + 1}`,
-            x: type === 'input' ? 0 : width,
-            y: 20 + index * 40,
+            id: `node-${get().nodes.length}`,
+            type: CUSTOM_NODE_TYPE,
+            data: {
+              label: `Node ${get().nodes.length}`,
+              width: NODE_WIDTH,
+              height: NODE_HEIGHT,
+              ports: [
+                { id: crypto.randomUUID(), type: 'input', label: 'In', x: 0, y: 20 },
+                { id: crypto.randomUUID(), type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
+              ],
+            },
+            position: { x: 40, y: 60 + get().nodes.length * 90 },
+            zIndex: 0,
           },
-        ]
+        ],
       }),
-    }),
-  updatePort: (nodeId, portId, patch) =>
-    set({
-      nodes: updateNodePorts(get().nodes, nodeId, (ports) =>
-        ports.map((port) => (port.id === portId ? { ...port, ...patch } : port)),
-      ),
-    }),
-  removePort: (nodeId, portId) =>
-    set({
-      nodes: updateNodePorts(get().nodes, nodeId, (ports) =>
-        ports.filter((port) => port.id !== portId),
-      ),
-    }),
-}))
+    updateNodeData: (id, data) =>
+      set({
+        nodes: get().nodes.map((node) =>
+          node.id === id ? { ...node, data: { ...node.data, ...data } } : node,
+        ),
+      }),
+    updateNodeZIndex: (id, zIndex) =>
+      set({
+        nodes: get().nodes.map((node) =>
+          node.id === id ? { ...node, zIndex } : node,
+        ),
+      }),
+    addPort: (nodeId, type) =>
+      set({
+        nodes: updateNodePorts(get().nodes, nodeId, (ports) => {
+          const node = get().nodes.find((n) => n.id === nodeId)
+          const width = node?.data.width ?? NODE_WIDTH
+          const index = ports.filter((port) => port.type === type).length
+          return [
+            ...ports,
+            {
+              id: crypto.randomUUID(),
+              type,
+              label: `${type === 'input' ? 'Input' : 'Output'} ${index + 1}`,
+              x: type === 'input' ? 0 : width,
+              y: 20 + index * 40,
+            },
+          ]
+        }),
+      }),
+    updatePort: (nodeId, portId, patch) =>
+      set({
+        nodes: updateNodePorts(get().nodes, nodeId, (ports) =>
+          ports.map((port) =>
+            (port.id === portId ? { ...port, ...patch } : port),
+          ),
+        ),
+      }),
+    removePort: (nodeId, portId) =>
+      set({
+        nodes: updateNodePorts(get().nodes, nodeId, (ports) =>
+          ports.filter((port) => port.id !== portId),
+        ),
+      }),
+    save: () => storage.save({ nodes: get().nodes, edges: get().edges }),
+  }))
+}
