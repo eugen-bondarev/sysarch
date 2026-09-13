@@ -8,7 +8,7 @@ import {
   type EdgeChange,
   type NodeChange,
 } from '@xyflow/react'
-import { GraphStorage } from './graph-storage'
+import { GraphStorage, type StoredEdge, type StoredNode } from './graph-storage'
 import { scalePortPosition } from '../lib/connection-path'
 import {
   CUSTOM_EDGE_TYPE,
@@ -72,7 +72,7 @@ const INITIAL_NODES: CustomNodeDefinition[] = [
   },
 ]
 
-const INITIAL_EDGES: CustomEdgeDefinition[] = [
+const INITIAL_EDGES: StoredEdge[] = [
   {
     id: 'a-b',
     source: 'a',
@@ -80,7 +80,6 @@ const INITIAL_EDGES: CustomEdgeDefinition[] = [
     target: 'b',
     targetHandle: 'b-in',
     type: CUSTOM_EDGE_TYPE,
-    markerEnd: { type: MarkerType.ArrowClosed, color: 'var(--color-primary)', strokeWidth: 2 },
   },
 ]
 
@@ -95,12 +94,43 @@ const updateNodePorts = (
       : node,
   )
 
+const EDGE_MARKER = {
+  type: MarkerType.ArrowClosed,
+  color: 'var(--color-primary)',
+  strokeWidth: 2,
+}
+
+const adornEdge = (edge: StoredEdge): CustomEdgeDefinition => ({
+  ...edge,
+  markerEnd: { ...EDGE_MARKER },
+})
+
+const sanitizeEdge = ({
+  markerStart,
+  markerEnd,
+  selected,
+  style,
+  className,
+  ...rest
+}: CustomEdgeDefinition): StoredEdge => rest
+
+const sanitizeNode = ({
+  measured,
+  selected,
+  dragging,
+  resizing,
+  width,
+  height,
+  ...rest
+}: CustomNodeDefinition): StoredNode => rest
+
 export const createFlowStore = (storage: GraphStorage) => {
   const saved = storage.load()
+  const edges = (saved?.edges ?? INITIAL_EDGES).map(adornEdge)
 
   return create<FlowStore>((set, get) => ({
     nodes: saved?.nodes ?? INITIAL_NODES,
-    edges: saved?.edges ?? INITIAL_EDGES,
+    edges,
     onNodesChange: (changes) =>
       set({
         nodes: applyNodeChanges(changes, get().nodes).map((node) => {
@@ -137,11 +167,7 @@ export const createFlowStore = (storage: GraphStorage) => {
           {
             ...connection,
             type: CUSTOM_EDGE_TYPE,
-            markerEnd: {
-              type: MarkerType.ArrowClosed,
-              color: 'var(--color-primary)',
-              strokeWidth: 2,
-            },
+            markerEnd: { ...EDGE_MARKER },
           },
           get().edges,
         ),
@@ -223,6 +249,10 @@ export const createFlowStore = (storage: GraphStorage) => {
           ports.filter((port) => port.id !== portId),
         ),
       }),
-    save: () => storage.save({ nodes: get().nodes, edges: get().edges }),
+    save: () =>
+      storage.save({
+        nodes: get().nodes.map(sanitizeNode),
+        edges: get().edges.map(sanitizeEdge),
+      }),
   }))
 }
