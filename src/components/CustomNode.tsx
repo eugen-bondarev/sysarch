@@ -77,7 +77,7 @@ export function CustomNode({
       ref={nodeRef}
       className={cn(
         'relative border border-zinc-300 bg-white px-4 py-2 shadow',
-        selected && 'border-[#ff7f00] ring-2 ring-[#ff7f00]/30',
+        selected && 'border-primary ring-2 ring-primary/30',
       )}
       style={{ width: data.width, height: data.height }}
       onMouseEnter={() => setHovered(true)}
@@ -88,7 +88,7 @@ export function CustomNode({
         isVisible={selected || hovered || resizing}
         minWidth={80}
         minHeight={60}
-        color="#ff7f00"
+        color="var(--color-primary)"
         onResizeStart={() => setResizing(true)}
         onResizeEnd={() => setResizing(false)}
       />

@@ -1,6 +1,10 @@
 @import 'tailwindcss';
 @import '@xyflow/react/dist/style.css';
 
+@theme {
+  --color-primary: #ff7f00;
+}
+
 .react-flow .react-flow__edges {
   z-index: 1000000;
 }
