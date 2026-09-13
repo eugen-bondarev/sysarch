@@ -1,5 +1,6 @@
 import { ReactFlow } from '@xyflow/react'
-import { CUSTOM_NODE_TYPE, CustomNode } from './CustomNode'
+import { CustomNode } from './CustomNode'
+import { CUSTOM_NODE_TYPE } from '../lib/node'
 import { CUSTOM_EDGE_TYPE, CustomEdge } from './CustomEdge'
 import { useFlowStore } from '../store'
 import { Sidebar } from './inspector/Sidebar'

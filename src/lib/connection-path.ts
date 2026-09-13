@@ -9,6 +9,47 @@ export type ConnectionPathOptions = {
   offset?: number
 }
 
+export function clampToPerimeter(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): Point {
+  const clamp = (value: number, max: number) => Math.max(0, Math.min(value, max))
+  const cx = clamp(x, width)
+  const cy = clamp(y, height)
+  const candidates = [
+    { point: { x: cx, y: 0 }, dx: cx - x, dy: y },
+    { point: { x: cx, y: height }, dx: cx - x, dy: height - y },
+    { point: { x: 0, y: cy }, dx: x, dy: cy - y },
+    { point: { x: width, y: cy }, dx: width - x, dy: cy - y },
+  ]
+  return candidates
+    .map(({ point, dx, dy }) => ({ point, d: dx * dx + dy * dy }))
+    .sort((a, b) => a.d - b.d)[0].point
+}
+
+export function scalePortPosition(
+  x: number,
+  y: number,
+  oldWidth: number,
+  oldHeight: number,
+  newWidth: number,
+  newHeight: number,
+): Point {
+  const side = getPortPosition(x, y, oldWidth, oldHeight)
+  switch (side) {
+    case 'left':
+      return { x: 0, y: (y / oldHeight) * newHeight }
+    case 'right':
+      return { x: newWidth, y: (y / oldHeight) * newHeight }
+    case 'top':
+      return { x: (x / oldWidth) * newWidth, y: 0 }
+    case 'bottom':
+      return { x: (x / oldWidth) * newWidth, y: newHeight }
+  }
+}
+
 const DIRECTION: Record<EdgePosition, Point> = {
   left: { x: -1, y: 0 },
   right: { x: 1, y: 0 },

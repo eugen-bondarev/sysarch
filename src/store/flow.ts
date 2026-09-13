@@ -8,6 +8,7 @@ import {
   type NodeChange,
 } from '@xyflow/react'
 import { GraphStorage } from './graph-storage'
+import { scalePortPosition } from '../lib/connection-path'
 import {
   CUSTOM_EDGE_TYPE,
   type CustomEdgeDefinition,
@@ -20,7 +21,7 @@ import {
   type CustomNodeDefinition,
   type Port,
   type PortType,
-} from '../components/CustomNode'
+} from '../lib/node'
 
 type FlowStore = {
   nodes: CustomNodeDefinition[]
@@ -109,9 +110,17 @@ export const createFlowStore = (storage: GraphStorage) => {
           if (node.data.width === width && node.data.height === height) {
             return node
           }
-          const ports = node.data.ports.map((port) =>
-            port.type === 'output' ? { ...port, x: width } : port,
-          )
+          const ports = node.data.ports.map((port) => ({
+            ...port,
+            ...scalePortPosition(
+              port.x,
+              port.y,
+              node.data.width,
+              node.data.height,
+              width,
+              height,
+            ),
+          }))
           return {
             ...node,
             data: { ...node.data, width, height, ports },
@@ -121,7 +130,9 @@ export const createFlowStore = (storage: GraphStorage) => {
     onEdgesChange: (changes) =>
       set({ edges: applyEdgeChanges(changes, get().edges) }),
     onConnect: (connection) =>
-      set({ edges: addEdge({ ...connection, type: CUSTOM_EDGE_TYPE }, get().edges) }),
+      set({
+        edges: addEdge({ ...connection, type: CUSTOM_EDGE_TYPE }, get().edges),
+      }),
     addNode: () =>
       set({
         nodes: [
@@ -134,8 +145,20 @@ export const createFlowStore = (storage: GraphStorage) => {
               width: NODE_WIDTH,
               height: NODE_HEIGHT,
               ports: [
-                { id: crypto.randomUUID(), type: 'input', label: 'In', x: 0, y: 20 },
-                { id: crypto.randomUUID(), type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
+                {
+                  id: crypto.randomUUID(),
+                  type: 'input',
+                  label: 'In',
+                  x: 0,
+                  y: 20,
+                },
+                {
+                  id: crypto.randomUUID(),
+                  type: 'output',
+                  label: 'Out',
+                  x: NODE_WIDTH,
+                  y: 20,
+                },
               ],
             },
             position: { x: 40, y: 60 + get().nodes.length * 90 },
@@ -177,7 +200,7 @@ export const createFlowStore = (storage: GraphStorage) => {
       set({
         nodes: updateNodePorts(get().nodes, nodeId, (ports) =>
           ports.map((port) =>
-            (port.id === portId ? { ...port, ...patch } : port),
+            port.id === portId ? { ...port, ...patch } : port,
           ),
         ),
       }),

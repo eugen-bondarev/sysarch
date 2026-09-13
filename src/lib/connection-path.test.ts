@@ -1,5 +1,10 @@
 import { describe, expect, test } from 'vitest'
-import { getConnectionPath, getPortPosition } from './connection-path'
+import {
+  clampToPerimeter,
+  getConnectionPath,
+  getPortPosition,
+  scalePortPosition,
+} from './connection-path'
 
 type Point = { x: number; y: number }
 type Cubic = { p0: Point; p1: Point; p2: Point; p3: Point }
@@ -110,5 +115,61 @@ describe('getPortPosition', () => {
 
   test('does not flip when the port is exactly on the edge', () => {
     expect(getPortPosition(420, 20, 420, 260)).toBe('right')
+  })
+})
+
+describe('clampToPerimeter', () => {
+  test('clamps a point inside to the nearest side', () => {
+    expect(clampToPerimeter(90, 20, 200, 200)).toEqual({ x: 90, y: 0 })
+  })
+
+  test('clamps a point inside near the left to the left edge', () => {
+    expect(clampToPerimeter(5, 100, 200, 200)).toEqual({ x: 0, y: 100 })
+  })
+
+  test('clamps a point outside to the right to the right edge', () => {
+    expect(clampToPerimeter(250, 30, 200, 200)).toEqual({ x: 200, y: 30 })
+  })
+
+  test('clamps a point outside below to the bottom edge', () => {
+    expect(clampToPerimeter(50, 250, 200, 200)).toEqual({ x: 50, y: 200 })
+  })
+
+  test('clamps a point outside past the corner to the corner', () => {
+    expect(clampToPerimeter(250, 250, 200, 200)).toEqual({ x: 200, y: 200 })
+  })
+
+  test('keeps an already-on-border point in place', () => {
+    expect(clampToPerimeter(0, 40, 200, 200)).toEqual({ x: 0, y: 40 })
+  })
+})
+
+describe('scalePortPosition', () => {
+  test('scales a port on the right edge along the height', () => {
+    expect(scalePortPosition(200, 100, 200, 200, 300, 400)).toEqual({
+      x: 300,
+      y: 200,
+    })
+  })
+
+  test('keeps a port on the left edge pinned to the left', () => {
+    expect(scalePortPosition(0, 50, 200, 200, 300, 400)).toEqual({
+      x: 0,
+      y: 100,
+    })
+  })
+
+  test('scales a port on the top edge along the width', () => {
+    expect(scalePortPosition(100, 0, 200, 200, 300, 400)).toEqual({
+      x: 150,
+      y: 0,
+    })
+  })
+
+  test('keeps a port on the bottom edge pinned to the bottom', () => {
+    expect(scalePortPosition(50, 200, 200, 200, 300, 400)).toEqual({
+      x: 75,
+      y: 400,
+    })
   })
 })

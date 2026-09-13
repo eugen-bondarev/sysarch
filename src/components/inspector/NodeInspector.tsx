@@ -1,5 +1,5 @@
 import { useFlowStore } from '../../store'
-import type { CustomNodeDefinition } from '../CustomNode'
+import type { CustomNodeDefinition } from '../../lib/node'
 import PortRow from './PortRow'
 
 type NodeInspectorProps = {

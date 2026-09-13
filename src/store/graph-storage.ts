@@ -1,5 +1,5 @@
 import type { CustomEdgeDefinition } from '../components/CustomEdge'
-import type { CustomNodeDefinition } from '../components/CustomNode'
+import type { CustomNodeDefinition } from '../lib/node'
 
 export type GraphData = {
   nodes: CustomNodeDefinition[]
