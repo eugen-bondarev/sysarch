@@ -1,4 +1,9 @@
-import { useEffect, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from 'react'
 import {
   Handle,
   NodeResizer,
@@ -6,10 +11,7 @@ import {
   type NodeProps,
 } from '@xyflow/react'
 import { clampToPerimeter, getPortPosition } from '../lib/connection-path'
-import {
-  PORT_POSITION,
-  type CustomNodeDefinition,
-} from '../lib/node'
+import { PORT_POSITION, type CustomNodeDefinition } from '../lib/node'
 import { useFlowStore } from '../store'
 import { cn } from '../lib/class'
 
@@ -75,7 +77,7 @@ export function CustomNode({
       ref={nodeRef}
       className={cn(
         'relative border border-zinc-300 bg-white px-4 py-2 shadow',
-        selected && 'border-violet-500 ring-2 ring-violet-300',
+        selected && 'border-[#ff7f00] ring-2 ring-[#ff7f00]/30',
       )}
       style={{ width: data.width, height: data.height }}
       onMouseEnter={() => setHovered(true)}
@@ -86,7 +88,7 @@ export function CustomNode({
         isVisible={selected || hovered || resizing}
         minWidth={80}
         minHeight={60}
-        color="#8b5cf6"
+        color="#ff7f00"
         onResizeStart={() => setResizing(true)}
         onResizeEnd={() => setResizing(false)}
       />
@@ -96,7 +98,11 @@ export function CustomNode({
           key={port.id}
           id={port.id}
           type={port.type === 'input' ? 'target' : 'source'}
-          position={PORT_POSITION[getPortPosition(port.x, port.y, data.width, data.height)]}
+          position={
+            PORT_POSITION[
+              getPortPosition(port.x, port.y, data.width, data.height)
+            ]
+          }
           isConnectableStart={port.type === 'output'}
           className={cn('nokey', draggingPortId === port.id && 'cursor-move')}
           style={{

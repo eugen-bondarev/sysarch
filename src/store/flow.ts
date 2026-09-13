@@ -80,7 +80,7 @@ const INITIAL_EDGES: CustomEdgeDefinition[] = [
     target: 'b',
     targetHandle: 'b-in',
     type: CUSTOM_EDGE_TYPE,
-    markerEnd: { type: MarkerType.ArrowClosed, color: '#8b5cf6', strokeWidth: 2 },
+    markerEnd: { type: MarkerType.ArrowClosed, color: '#ff7f00', strokeWidth: 2 },
   },
 ]
 
@@ -139,7 +139,7 @@ export const createFlowStore = (storage: GraphStorage) => {
             type: CUSTOM_EDGE_TYPE,
             markerEnd: {
               type: MarkerType.ArrowClosed,
-              color: '#8b5cf6',
+              color: '#ff7f00',
               strokeWidth: 2,
             },
           },
