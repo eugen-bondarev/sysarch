@@ -3,7 +3,10 @@ import {
   Handle,
   NodeResizer,
   Position,
+  useNodeConnections,
+  useStore,
   useUpdateNodeInternals,
+  type InternalNode,
   type Node,
   type NodeProps,
 } from '@xyflow/react'
@@ -33,14 +36,74 @@ export const CUSTOM_NODE_TYPE = 'CUSTOM_NODE'
 
 export type CustomNodeDefinition = Node<CustomNodeData, typeof CUSTOM_NODE_TYPE>
 
+function facingPosition(
+  other: InternalNode | undefined,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+): Position | undefined {
+  if (!other) {
+    return undefined
+  }
+  const position = other.internals.positionAbsolute
+  const otherWidth = other.measured.width ?? other.width ?? 0
+  const otherHeight = other.measured.height ?? other.height ?? 0
+  const dx = position.x + otherWidth / 2 - (x + width / 2)
+  const dy = position.y + otherHeight / 2 - (y + height / 2)
+  if (Math.abs(dx) > Math.abs(dy)) {
+    return dx > 0 ? Position.Right : Position.Left
+  }
+  return dy > 0 ? Position.Bottom : Position.Top
+}
+
 export function CustomNode({
   id,
   data,
   selected,
+  positionAbsoluteX,
+  positionAbsoluteY,
 }: NodeProps<CustomNodeDefinition>) {
   const updateNodeInternals = useUpdateNodeInternals()
   const [hovered, setHovered] = useState(false)
   const [resizing, setResizing] = useState(false)
+
+  const connections = useNodeConnections({ id })
+  const outputPort = data.ports.find((port) => port.type === 'output')
+  const inputPort = data.ports.find((port) => port.type === 'input')
+  const outputConnection = connections.find(
+    (connection) =>
+      connection.source === id && connection.sourceHandle === outputPort?.id,
+  )
+  const inputConnection = connections.find(
+    (connection) =>
+      connection.target === id && connection.targetHandle === inputPort?.id,
+  )
+  const outputTarget = useStore(
+    (state) =>
+      outputConnection ? state.nodeLookup.get(outputConnection.target) : undefined,
+  )
+  const inputSource = useStore(
+    (state) =>
+      inputConnection ? state.nodeLookup.get(inputConnection.source) : undefined,
+  )
+
+  const outputPosition =
+    facingPosition(
+      outputTarget,
+      positionAbsoluteX,
+      positionAbsoluteY,
+      data.width,
+      data.height,
+    ) ?? Position.Right
+  const inputPosition =
+    facingPosition(
+      inputSource,
+      positionAbsoluteX,
+      positionAbsoluteY,
+      data.width,
+      data.height,
+    ) ?? Position.Left
 
   useEffect(() => {
     updateNodeInternals(id)
@@ -70,13 +133,8 @@ export function CustomNode({
           key={port.id}
           id={port.id}
           type={port.type === 'input' ? 'target' : 'source'}
-          position={port.type === 'input' ? Position.Left : Position.Right}
+          position={port.type === 'output' ? outputPosition : inputPosition}
           isConnectableStart={port.type === 'output'}
-          style={{
-            left: port.x,
-            top: port.y,
-            transform: `translate(calc(-50% - ${port.type === 'input' ? 0 : 2}px), -50%)`,
-          }}
         />
       ))}
     </div>
