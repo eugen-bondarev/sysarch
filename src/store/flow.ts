@@ -25,12 +25,19 @@ import {
   type PortType,
 } from '../lib/node'
 
+type FlowApi = {
+  screenToFlowPosition: (position: XYPosition) => XYPosition
+  getCursor: () => XYPosition | null
+}
+
 type FlowStore = {
   nodes: CustomNodeDefinition[]
   edges: CustomEdgeDefinition[]
+  flowApi: FlowApi | null
   onNodesChange: (changes: NodeChange<CustomNodeDefinition>[]) => void
   onEdgesChange: (changes: EdgeChange<CustomEdgeDefinition>[]) => void
   onConnect: (connection: Connection) => void
+  registerFlowApi: (api: FlowApi) => void
   addNode: (position?: XYPosition) => void
   updateNodeData: (id: string, data: Partial<CustomNodeData>) => void
   updateNodeZIndex: (id: string, zIndex: number) => void
@@ -125,6 +132,20 @@ const sanitizeNode = ({
   ...rest
 }: CustomNodeDefinition): StoredNode => rest
 
+const resolveCursorPosition = (
+  get: () => FlowStore,
+): XYPosition | undefined => {
+  const { flowApi } = get()
+  if (!flowApi) {
+    return undefined
+  }
+  const cursor = flowApi.getCursor() ?? {
+    x: window.innerWidth / 2,
+    y: window.innerHeight / 2,
+  }
+  return flowApi.screenToFlowPosition(cursor)
+}
+
 export const createFlowStore = (storage: GraphStorage) => {
   const saved = storage.load()
   const edges = (saved?.edges ?? INITIAL_EDGES).map(adornEdge)
@@ -132,6 +153,7 @@ export const createFlowStore = (storage: GraphStorage) => {
   return create<FlowStore>((set, get) => ({
     nodes: saved?.nodes ?? INITIAL_NODES,
     edges,
+    flowApi: null,
     onNodesChange: (changes) =>
       set({
         nodes: applyNodeChanges(changes, get().nodes).map((node) => {
@@ -173,6 +195,7 @@ export const createFlowStore = (storage: GraphStorage) => {
           get().edges,
         ),
       }),
+    registerFlowApi: (api) => set({ flowApi: api }),
     addNode: (position) =>
       set({
         nodes: [
@@ -201,7 +224,12 @@ export const createFlowStore = (storage: GraphStorage) => {
                 },
               ],
             },
-            position: position ?? { x: 40, y: 60 + get().nodes.length * 90 },
+            position:
+              position ??
+              resolveCursorPosition(get) ?? {
+                x: 40,
+                y: 60 + get().nodes.length * 90,
+              },
             selected: true,
             zIndex: 0,
           },

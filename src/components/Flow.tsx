@@ -23,41 +23,18 @@ const isSystemDark = () =>
   window.matchMedia?.('(prefers-color-scheme: dark)')?.matches ?? false
 
 function FlowCanvas({ theme }: { theme: Theme }) {
-  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, addNode } =
+  const { nodes, edges, onNodesChange, onEdgesChange, onConnect, registerFlowApi } =
     useFlowStore()
 
   const { screenToFlowPosition } = useReactFlow()
   const mouseRef = useRef<XYPosition | null>(null)
 
   useEffect(() => {
-    const isEditableTarget = (target: EventTarget | null) =>
-      target instanceof HTMLElement &&
-      (target.tagName === 'INPUT' ||
-        target.tagName === 'TEXTAREA' ||
-        target.tagName === 'SELECT' ||
-        target.isContentEditable)
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (
-        !(event.ctrlKey || event.metaKey) ||
-        event.key.toLowerCase() !== 'a'
-      ) {
-        return
-      }
-      if (isEditableTarget(event.target)) {
-        return
-      }
-      event.preventDefault()
-      const mouse = mouseRef.current ?? {
-        x: window.innerWidth / 2,
-        y: window.innerHeight / 2,
-      }
-      addNode(screenToFlowPosition(mouse))
-    }
-
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [addNode, screenToFlowPosition])
+    registerFlowApi({
+      screenToFlowPosition,
+      getCursor: () => mouseRef.current,
+    })
+  }, [registerFlowApi, screenToFlowPosition])
 
   return (
     <div
