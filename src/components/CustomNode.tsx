@@ -112,7 +112,7 @@ export function CustomNode({
     <div
       ref={nodeRef}
       className={cn(
-        'relative border border-zinc-300 bg-white px-4 py-2 shadow dark:border-zinc-600 dark:bg-zinc-900',
+        'relative border border-zinc-300 bg-white px-4 py-2 dark:border-zinc-600 dark:bg-zinc-900',
         selected && 'border-primary ring-2 ring-primary/30',
         deleting
           ? 'animate-[node-out_180ms_ease-in_forwards]'

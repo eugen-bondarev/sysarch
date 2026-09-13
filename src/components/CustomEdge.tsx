@@ -1,13 +1,5 @@
-import {
-  BaseEdge,
-  Position,
-  type Edge,
-  type EdgeProps,
-} from '@xyflow/react'
-import {
-  getConnectionPath,
-  type EdgePosition,
-} from '../lib/connection-path'
+import { BaseEdge, Position, type Edge, type EdgeProps } from '@xyflow/react'
+import { getConnectionPath, type EdgePosition } from '../lib/connection-path'
 
 export type CustomEdgeData = Record<string, never>
 
@@ -49,7 +41,7 @@ export function CustomEdge(props: EdgeProps<CustomEdgeDefinition>) {
       markerStart={props.markerStart}
       markerEnd={props.markerEnd}
       interactionWidth={props.interactionWidth}
-      style={{ strokeWidth: 2 }}
+      style={{ strokeWidth: 1 }}
     />
   )
 }

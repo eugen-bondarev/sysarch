@@ -1,3 +1,5 @@
+@import '@fontsource-variable/playfair-display';
+@import '@fontsource-variable/noto-sans';
 @import 'tailwindcss';
 @import '@xyflow/react/dist/style.css';
 
@@ -5,6 +7,12 @@
 
 @theme {
   --color-primary: #ff7f00;
+  --font-sans: 'Noto Sans Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji';
+  --font-display: 'Playfair Display Variable', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+}
+
+.react-flow {
+  font-family: var(--font-display);
 }
 
 .react-flow .react-flow__edges {
