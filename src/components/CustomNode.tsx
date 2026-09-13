@@ -76,7 +76,7 @@ export function CustomNode({
     <div
       ref={nodeRef}
       className={cn(
-        'relative border border-zinc-300 bg-white px-4 py-2 shadow',
+        'relative border border-zinc-300 bg-white px-4 py-2 shadow dark:border-zinc-600 dark:bg-zinc-900',
         selected && 'border-primary ring-2 ring-primary/30',
       )}
       style={{ width: data.width, height: data.height }}
@@ -92,7 +92,9 @@ export function CustomNode({
         onResizeStart={() => setResizing(true)}
         onResizeEnd={() => setResizing(false)}
       />
-      <span className="text-sm font-medium text-zinc-700">{data.label}</span>
+      <span className="text-sm font-medium text-zinc-700 dark:text-zinc-200">
+        {data.label}
+      </span>
       {data.ports.map((port) => (
         <Handle
           key={port.id}

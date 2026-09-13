@@ -1,10 +1,26 @@
 @import 'tailwindcss';
 @import '@xyflow/react/dist/style.css';
 
+@custom-variant dark (.dark &);
+
 @theme {
   --color-primary: #ff7f00;
 }
 
 .react-flow .react-flow__edges {
   z-index: 1000000;
+}
+
+.react-flow {
+  --xy-background-color: #fff;
+  --xy-background-pattern-color: #d4d4d8;
+}
+
+.react-flow.dark {
+  --xy-background-color: #141414;
+  --xy-background-pattern-color: #555;
+}
+
+html.dark {
+  background-color: #141414;
 }

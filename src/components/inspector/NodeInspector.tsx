@@ -13,36 +13,44 @@ export function NodeInspector({ node }: NodeInspectorProps) {
 
   return (
     <>
-      <h2 className="mb-3 text-sm font-semibold text-zinc-800">Node details</h2>
-      <label className="block text-xs font-medium text-zinc-500">Label</label>
+      <h2 className="mb-3 text-sm font-semibold text-zinc-800 dark:text-zinc-100">
+        Node details
+      </h2>
+      <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        Label
+      </label>
       <input
         value={node.data.label}
         onChange={(event) =>
           updateNodeData(node.id, { label: event.target.value })
         }
-        className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-800 focus:border-violet-500 focus:outline-none"
+        className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-800 focus:border-violet-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
       />
-      <label className="mt-3 block text-xs font-medium text-zinc-500">Z-index</label>
+      <label className="mt-3 block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        Z-index
+      </label>
       <input
         type="number"
         value={node.zIndex ?? 0}
         onChange={(event) =>
           updateNodeZIndex(node.id, Number(event.target.value))
         }
-        className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-800 focus:border-violet-500 focus:outline-none"
+        className="mt-1 w-full rounded-md border border-zinc-300 px-2 py-1 text-sm text-zinc-800 focus:border-violet-500 focus:outline-none dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100"
       />
       <div className="mt-3 flex items-center justify-between">
-        <h3 className="text-xs font-semibold text-zinc-500">Ports</h3>
+        <h3 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+          Ports
+        </h3>
         <div className="flex gap-1">
           <button
             onClick={() => addPort(node.id, 'input')}
-            className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 hover:bg-zinc-200"
+            className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
           >
             + Input
           </button>
           <button
             onClick={() => addPort(node.id, 'output')}
-            className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 hover:bg-zinc-200"
+            className="rounded bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
           >
             + Output
           </button>
