@@ -125,12 +125,9 @@ export const createFlowStore = (storage: GraphStorage) => {
         nodes: applyNodeChanges(changes, get().nodes).map((node) => {
           const width = node.width!
           const height = node.height!
-          if (width === undefined || height === undefined) {
+          if (!width || !height) {
             return node
           }
-          // if (node.data.width === width && node.data.height === height) {
-          //   return node
-          // }
           const ports = node.data.ports.map((port) => ({
             ...port,
             ...scalePortPosition(
@@ -185,22 +182,7 @@ export const createFlowStore = (storage: GraphStorage) => {
               label: `Node ${get().nodes.length}`,
               width: NODE_WIDTH,
               height: NODE_HEIGHT,
-              ports: [
-                {
-                  id: crypto.randomUUID(),
-                  type: 'input',
-                  label: 'In',
-                  x: 0,
-                  y: 20,
-                },
-                {
-                  id: crypto.randomUUID(),
-                  type: 'output',
-                  label: 'Out',
-                  x: NODE_WIDTH,
-                  y: 20,
-                },
-              ],
+              ports: [],
             },
             position: position ??
               resolveCursorPosition(get) ?? {
@@ -229,18 +211,15 @@ export const createFlowStore = (storage: GraphStorage) => {
     addPort: (nodeId, type, x, y) =>
       set({
         nodes: updateNodePorts(get().nodes, nodeId, (ports) => {
-          const node = get().nodes.find((n) => n.id === nodeId)
-          const width = node?.data.width ?? NODE_WIDTH
-          const index = ports.filter((port) => port.type === type).length
           return [
             ...ports,
             {
               id: crypto.randomUUID(),
               type,
-              label: `${type === 'input' ? 'Input' : 'Output'} ${index + 1}`,
-              x: x ?? (type === 'input' ? 0 : width),
-              y: y ?? 20 + index * 40,
-            },
+              label: 'Port',
+              x,
+              y,
+            } as Port,
           ]
         }),
       }),

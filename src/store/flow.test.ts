@@ -16,16 +16,6 @@ describe('addPort', () => {
     const port = node.data.ports.at(-1)!
     expect(port).toMatchObject({ type: 'input', x: 0, y: 50 })
   })
-
-  it('uses the default placement when no position is provided', () => {
-    const store = createStore()
-
-    store.getState().addPort('a', 'output')
-
-    const node = store.getState().nodes.find((n) => n.id === 'a')!
-    const port = node.data.ports.at(-1)!
-    expect(port).toMatchObject({ type: 'output', x: node.data.width, y: 60 })
-  })
 })
 
 describe('flipPort', () => {
