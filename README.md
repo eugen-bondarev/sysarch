@@ -2,8 +2,6 @@
 
 I want to build big architecture diagrams for complex software.
 
-This requires creating architectural diagrams.
-
 I want an editor to create diagrams in a flexible way.
 
 I evaluated my manual process in a drawing app on iPad and came up with the following idea:
