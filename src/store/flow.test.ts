@@ -1,27 +1,14 @@
-import { describe, expect, it, beforeAll } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { createFlowStore } from './flow'
-import { LocalStorageGraphStorage } from './local-storage-graph-storage'
+import { INITIAL_EDGES, INITIAL_NODES } from './test-fixtures'
+import { MockGraphStorage } from './mock-graph-storage'
 
-beforeAll(() => {
-  const store = new Map<string, string>()
-  globalThis.localStorage = {
-    getItem: (key: string) => store.get(key) ?? null,
-    setItem: (key: string, value: string) => void store.set(key, value),
-    removeItem: (key: string) => void store.delete(key),
-    clear: () => store.clear(),
-    key: (index: number) => [...store.keys()][index] ?? null,
-    get length() {
-      return store.size
-    },
-  }
-})
+const createStore = () =>
+  createFlowStore(new MockGraphStorage(INITIAL_NODES, INITIAL_EDGES))
 
 describe('addPort', () => {
   it('places a port at the given position when provided', () => {
-    localStorage.clear()
-    const store = createFlowStore(
-      new LocalStorageGraphStorage('sysarch.graph.test'),
-    )
+    const store = createStore()
 
     store.getState().addPort('a', 'input', 0, 50)
 
@@ -31,10 +18,7 @@ describe('addPort', () => {
   })
 
   it('uses the default placement when no position is provided', () => {
-    localStorage.clear()
-    const store = createFlowStore(
-      new LocalStorageGraphStorage('sysarch.graph.test'),
-    )
+    const store = createStore()
 
     store.getState().addPort('a', 'output')
 
@@ -45,9 +29,6 @@ describe('addPort', () => {
 })
 
 describe('flipPort', () => {
-  const createStore = () =>
-    createFlowStore(new LocalStorageGraphStorage('sysarch.graph.test'))
-
   const port = (store: ReturnType<typeof createStore>, id: string) =>
     store
       .getState()
@@ -55,7 +36,6 @@ describe('flipPort', () => {
       .data.ports.find((p) => p.id === id)!
 
   it('flips an input port to an output port and keeps its position', () => {
-    localStorage.clear()
     const store = createStore()
 
     store.getState().flipPort('a', 'a-in')
@@ -64,7 +44,6 @@ describe('flipPort', () => {
   })
 
   it('flips an output port to an input port', () => {
-    localStorage.clear()
     const store = createStore()
 
     store.getState().flipPort('a', 'a-out')
@@ -73,7 +52,6 @@ describe('flipPort', () => {
   })
 
   it('removes the edge that uses the flipped port as source', () => {
-    localStorage.clear()
     const store = createStore()
 
     store.getState().flipPort('a', 'a-out')
@@ -82,7 +60,6 @@ describe('flipPort', () => {
   })
 
   it('removes the edge that uses the flipped port as target', () => {
-    localStorage.clear()
     const store = createStore()
 
     store.getState().flipPort('b', 'b-in')
@@ -91,7 +68,6 @@ describe('flipPort', () => {
   })
 
   it('keeps edges that connect to other ports', () => {
-    localStorage.clear()
     const store = createStore()
     store.getState().onConnect({
       source: 'b',
@@ -116,10 +92,7 @@ describe('flipPort', () => {
 
 describe('portEditMode', () => {
   it('tracks whether the port editing mode is active', () => {
-    localStorage.clear()
-    const store = createFlowStore(
-      new LocalStorageGraphStorage('sysarch.graph.test'),
-    )
+    const store = createStore()
 
     expect(store.getState().portEditMode).toBe(false)
     store.getState().setPortEditMode(true)

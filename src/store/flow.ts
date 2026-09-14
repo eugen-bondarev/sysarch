@@ -54,50 +54,6 @@ type FlowStore = {
   save: () => void
 }
 
-const INITIAL_NODES: CustomNodeDefinition[] = [
-  {
-    id: 'a',
-    type: CUSTOM_NODE_TYPE,
-    data: {
-      label: 'Alpha',
-      width: NODE_WIDTH,
-      height: NODE_HEIGHT,
-      ports: [
-        { id: 'a-in', type: 'input', label: 'In', x: 0, y: 20 },
-        { id: 'a-out', type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
-      ],
-    },
-    position: { x: 40, y: 140 },
-    zIndex: 0,
-  },
-  {
-    id: 'b',
-    type: CUSTOM_NODE_TYPE,
-    data: {
-      label: 'Beta',
-      width: NODE_WIDTH,
-      height: NODE_HEIGHT,
-      ports: [
-        { id: 'b-in', type: 'input', label: 'In', x: 0, y: 20 },
-        { id: 'b-out', type: 'output', label: 'Out', x: NODE_WIDTH, y: 20 },
-      ],
-    },
-    position: { x: 300, y: 140 },
-    zIndex: 0,
-  },
-]
-
-const INITIAL_EDGES: StoredEdge[] = [
-  {
-    id: 'a-b',
-    source: 'a',
-    sourceHandle: 'a-out',
-    target: 'b',
-    targetHandle: 'b-in',
-    type: CUSTOM_EDGE_TYPE,
-  },
-]
-
 const updateNodePorts = (
   nodes: CustomNodeDefinition[],
   nodeId: string,
@@ -155,10 +111,10 @@ const resolveCursorPosition = (
 
 export const createFlowStore = (storage: GraphStorage) => {
   const saved = storage.load()
-  const edges = (saved?.edges ?? INITIAL_EDGES).map(adornEdge)
+  const edges = (saved?.edges ?? []).map(adornEdge)
 
   return create<FlowStore>((set, get) => ({
-    nodes: saved?.nodes ?? INITIAL_NODES,
+    nodes: saved?.nodes ?? [],
     edges,
     flowApi: null,
     deletingNodeIds: [],
@@ -167,14 +123,14 @@ export const createFlowStore = (storage: GraphStorage) => {
     onNodesChange: (changes) =>
       set({
         nodes: applyNodeChanges(changes, get().nodes).map((node) => {
-          const width = node.width
-          const height = node.height
+          const width = node.width!
+          const height = node.height!
           if (width === undefined || height === undefined) {
             return node
           }
-          if (node.data.width === width && node.data.height === height) {
-            return node
-          }
+          // if (node.data.width === width && node.data.height === height) {
+          //   return node
+          // }
           const ports = node.data.ports.map((port) => ({
             ...port,
             ...scalePortPosition(
@@ -214,9 +170,7 @@ export const createFlowStore = (storage: GraphStorage) => {
       set({
         nodes: get().nodes.filter((node) => !nodeSet.has(node.id)),
         edges: get().edges.filter((edge) => !edgeSet.has(edge.id)),
-        deletingNodeIds: get().deletingNodeIds.filter(
-          (id) => !nodeSet.has(id),
-        ),
+        deletingNodeIds: get().deletingNodeIds.filter((id) => !nodeSet.has(id)),
       })
     },
     addNode: (position) => {
@@ -248,8 +202,7 @@ export const createFlowStore = (storage: GraphStorage) => {
                 },
               ],
             },
-            position:
-              position ??
+            position: position ??
               resolveCursorPosition(get) ?? {
                 x: 40,
                 y: 60 + get().nodes.length * 90,
